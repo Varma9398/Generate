@@ -229,12 +229,12 @@
         imgElement.loading = 'lazy';
         
         // First try PNG
-        imgElement.src = `public/images/${imageNum}.png`;
+        imgElement.src = `/images/${imageNum}.png`;
         
         // If PNG fails, try JPG
         imgElement.onerror = function() {
           if (this.src.endsWith('.png')) {
-            this.src = `public/images/${imageNum}.jpg`;
+            this.src = `/images/${imageNum}.jpg`;
           } else {
             console.error(`Failed to load image: ${imageNum} (tried both .png and .jpg)`);
           }
