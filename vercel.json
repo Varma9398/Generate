@@ -3,13 +3,5 @@
     "api/*.js": {
       "runtime": "@vercel/node@3.0.11"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  }
 }
