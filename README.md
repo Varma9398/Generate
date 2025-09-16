@@ -1,31 +1,6 @@
 # Cloud AI Image Generator - Secure Backend
 
-[![Deploy](https://img.shields.io/badge/deploy-ready-brightgreen.svg)](https://github.com/Varma9398/Ge)
-[![Security](https://img.shields.io/badge/security-hardened-blue.svg)](https://github.com/Varma9398/Ge)
-[![Node.js](https://img.shields.io/badge/node.js-18+-green.svg)](https://nodejs.org/)
-
 A secure web application for AI-powered image style transformation with a Node.js backend to protect API credentials.
-
-## 🚀 **Deploy to Vercel (FREE)**
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Varma9398/Ge)
-
-1. Click the deploy button above
-2. Connect your GitHub account
-3. Add environment variables in Vercel dashboard:
-   - `GEMINI_API_KEY`
-   - `SUPABASE_URL` 
-   - `SUPABASE_ANON_KEY`
-   - `ALLOWED_ORIGINS`
-4. Deploy automatically!
-
-## 📋 **Required Environment Variables**
-
-| Variable | Description | Where to Get |
-|----------|-------------|--------------|
-| `GEMINI_API_KEY` | Google Gemini AI API key | [Get it here](https://aistudio.google.com/app/apikey) |
-| `SUPABASE_URL` | Your Supabase project URL | [Supabase Dashboard](https://supabase.com/dashboard) |
-| `SUPABASE_ANON_KEY` | Supabase anonymous key | [Supabase Dashboard](https://supabase.com/dashboard) |
-| `ALLOWED_ORIGINS` | Your deployed domain URL | e.g., `https://your-app.vercel.app` |
 
 ## 🔒 Security Features
 

@@ -655,10 +655,10 @@
   </footer>
 
   <script>
-    // Backend API Configuration - Update this URL when deployed
-    const API_BASE_URL = window.location.hostname === 'localhost' ? 
-      'http://localhost:3000/api' : 
-      `${window.location.protocol}//${window.location.host}/api`;
+    // Backend API Configuration
+    const API_BASE_URL = process.env.NODE_ENV === 'production' 
+      ? '/api' // Vercel serverless functions
+      : 'http://localhost:3000/api'; // Local development
     
     // Remove exposed API key
     // const GEMINI_API_KEY = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx';

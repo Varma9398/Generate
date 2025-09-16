@@ -171,9 +171,9 @@
 
   <script>
     // --- Backend API Configuration ---
-    const API_BASE_URL = window.location.hostname === 'localhost' ? 
-      'http://localhost:3000/api' : 
-      `${window.location.protocol}//${window.location.host}/api`;
+    const API_BASE_URL = window.location.hostname === 'localhost' 
+      ? 'http://localhost:3000/api' // Local development
+      : '/api'; // Vercel production
     
     // Utility function for API calls
     async function apiCall(endpoint, method = 'GET', data = null) {
@@ -205,7 +205,7 @@
         const item = document.createElement('div');
         item.className = 'gallery-item';
         item.innerHTML = `
-          <img src="public/images/${num}.png" alt="Image ${num}" loading="lazy" />
+          <img src="images/${num}.png" alt="Image ${num}" loading="lazy" />
           <div class="item-content">
             <div class="item-title">Image ${num}</div>
             <div class="item-description">Gallery item ${num}</div>
@@ -250,7 +250,7 @@
       const password = document.getElementById("password").value;
 
       try {
-        const endpoint = isLogin ? '/auth/signin' : '/auth/signup';
+        const endpoint = isLogin ? '/signin' : '/signup';
         const result = await apiCall(endpoint, 'POST', { email, password });
         
         if (result.error) {
