@@ -23,7 +23,7 @@ app.use(helmet({
 }));
 
 // CORS configuration
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000', 'http://localhost:5500', 'http://127.0.0.1:5500'];
 app.use(cors({
   origin: allowedOrigins,
   credentials: true,
@@ -34,7 +34,7 @@ app.use(cors({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // Increased for testing
   message: { error: 'Too many requests, please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -200,6 +200,41 @@ app.post('/api/analyze-image', upload.single('image'), async (req, res) => {
   } catch (error) {
     console.error('Image analysis error:', error);
     res.status(500).json({ error: error.message });
+  }
+});
+
+// Get available images from folder
+app.get('/api/images', async (req, res) => {
+  try {
+    const fs = require('fs').promises;
+    const path = require('path');
+    
+    const imagesDir = path.join(__dirname, 'public', 'images');
+    
+    // Check if directory exists
+    try {
+      await fs.access(imagesDir);
+    } catch (error) {
+      return res.json({ images: [] });
+    }
+    
+    // Read directory contents
+    const files = await fs.readdir(imagesDir);
+    
+    // Filter for image files and extract numbers
+    const imageNumbers = files
+      .filter(file => file.toLowerCase().endsWith('.png') || file.toLowerCase().endsWith('.jpg') || file.toLowerCase().endsWith('.jpeg'))
+      .map(file => {
+        const match = file.match(/^(\d+)\./); // Extract number from filename like "001.png"
+        return match ? match[1] : null;
+      })
+      .filter(num => num !== null)
+      .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
+    
+    res.json({ images: imageNumbers });
+  } catch (error) {
+    console.error('Error reading images directory:', error);
+    res.status(500).json({ error: 'Failed to read images directory' });
   }
 });
 

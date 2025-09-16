@@ -1,8 +1,13 @@
 {
+  "functions": {
+    "api/*.js": {
+      "runtime": "@vercel/node@18.x"
+    }
+  },
   "rewrites": [
     {
-      "source": "/images/(.*)",
-      "destination": "/public/images/$1"
+      "source": "/public/(.*)",
+      "destination": "/public/$1"
     }
   ],
   "redirects": [

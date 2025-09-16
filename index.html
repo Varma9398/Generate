@@ -140,6 +140,7 @@
         <div id="gallery" class="gallery-grid"></div>
         <div class="load-more-wrap">
           <button id="loadMoreBtn" class="load-more-btn">Load more</button>
+          <button id="refreshBtn" class="load-more-btn" style="margin-left: 10px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🔄 Refresh</button>
         </div>
       </section>
     </div>
@@ -171,9 +172,7 @@
 
   <script>
     // --- Backend API Configuration ---
-    const API_BASE_URL = window.location.hostname === 'localhost' 
-      ? 'http://localhost:3000/api' // Local development
-      : '/api'; // Vercel production
+    const API_BASE_URL = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : '/api';
     
     // Utility function for API calls
     async function apiCall(endpoint, method = 'GET', data = null) {
@@ -193,30 +192,106 @@
     }
 
     // --- Gallery Logic ---
-    const totalImages = 48;
-    const batchSize = 24;
+    let availableImages = [];
+    let totalImages = 0;
+    const batchSize = 25;
     const gallery = document.getElementById('gallery');
     let currentIndex = 0;
 
+    // Function to fetch available images from backend
+    async function fetchAvailableImages() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/images`);
+        const data = await response.json();
+        availableImages = data.images || [];
+        totalImages = availableImages.length;
+        return availableImages;
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        // Fallback to hardcoded list if API fails
+        availableImages = ['001', '002', '003', '004', '005', '006', '007', '008', '009', '010', '011', '012'];
+        totalImages = availableImages.length;
+        return availableImages;
+      }
+    }
+
     function loadBatch() {
       const nextIndex = Math.min(currentIndex + batchSize, totalImages);
-      for (let i = currentIndex + 1; i <= nextIndex; i++) {
-        const num = String(i).padStart(3, '0');
+      
+      for (let i = currentIndex; i < nextIndex; i++) {
+        const imageNum = availableImages[i];
         const item = document.createElement('div');
         item.className = 'gallery-item';
+        
+        // Try to load PNG first, if it fails, try JPG
+        const imgElement = document.createElement('img');
+        imgElement.alt = `AI Generated Art ${imageNum}`;
+        imgElement.loading = 'lazy';
+        
+        // First try PNG
+        imgElement.src = `public/images/${imageNum}.png`;
+        
+        // If PNG fails, try JPG
+        imgElement.onerror = function() {
+          if (this.src.endsWith('.png')) {
+            this.src = `public/images/${imageNum}.jpg`;
+          } else {
+            console.error(`Failed to load image: ${imageNum} (tried both .png and .jpg)`);
+          }
+        };
+        
         item.innerHTML = `
-          <img src="images/${num}.png" alt="Image ${num}" loading="lazy" />
           <div class="item-content">
-            <div class="item-title">Image ${num}</div>
-            <div class="item-description">Gallery item ${num}</div>
+            <div class="item-title">AI Art ${imageNum}</div>
+            <div class="item-description">AI-generated artwork</div>
           </div>`;
+        
+        // Insert image at the beginning
+        item.insertBefore(imgElement, item.firstChild);
         gallery.appendChild(item);
       }
       currentIndex = nextIndex;
-      if (currentIndex >= totalImages) document.getElementById('loadMoreBtn').style.display = 'none';
+      if (currentIndex >= totalImages) {
+        document.getElementById('loadMoreBtn').style.display = 'none';
+      }
+    }
+
+    // Function to refresh gallery with new images
+    async function refreshGallery(force = false) {
+      const oldCount = totalImages;
+      await fetchAvailableImages();
+      
+      // Only refresh if new images were added or force refresh
+      if (totalImages > oldCount || force) {
+        if (force) {
+          console.log('Manual refresh triggered');
+          // For manual refresh, clear gallery and reload from beginning
+          gallery.innerHTML = '';
+          currentIndex = 0;
+          loadBatch();
+        } else {
+          console.log(`New images detected: ${totalImages - oldCount}`);
+          // Show load more button if it was hidden and there are more images to load
+          if (currentIndex < totalImages) {
+            document.getElementById('loadMoreBtn').style.display = 'block';
+          }
+        }
+      }
+    }
+
+    // Initialize gallery
+    async function initGallery() {
+      await fetchAvailableImages();
+      loadBatch();
+      
+      // Set up periodic refresh every 5 seconds
+      setInterval(refreshGallery, 5000);
     }
     document.getElementById('loadMoreBtn').addEventListener('click', loadBatch);
-    loadBatch();
+    document.getElementById('refreshBtn').addEventListener('click', () => refreshGallery(true));
+    
+    // Initialize gallery when page loads
+    initGallery();
 
     // --- Auth Modal Logic ---
     const modal = document.getElementById('authModal');
@@ -250,7 +325,7 @@
       const password = document.getElementById("password").value;
 
       try {
-        const endpoint = isLogin ? '/signin' : '/signup';
+        const endpoint = isLogin ? '/auth/signin' : '/auth/signup';
         const result = await apiCall(endpoint, 'POST', { email, password });
         
         if (result.error) {

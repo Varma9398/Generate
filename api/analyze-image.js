@@ -1,11 +1,13 @@
 export default async function handler(req, res) {
   // Set CORS headers
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
   if (req.method !== 'POST') {
@@ -13,15 +15,14 @@ export default async function handler(req, res) {
   }
 
   try {
-    // Handle JSON body with base64 image data
-    const { imageData, artStyle = 'paper', styleIntensity = 'moderate' } = req.body;
+    const { artStyle, styleIntensity, imageData } = req.body;
     
     if (!imageData) {
       return res.status(400).json({ error: 'No image data provided' });
     }
 
-    // Extract base64 data (remove data URL prefix if present)
-    const base64Data = imageData.includes(',') ? imageData.split(',')[1] : imageData;
+    // Extract base64 data
+    const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
     
     const stylePrompts = {
       paper: {
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
           },
           {
             inline_data: {
-              mime_type: "image/jpeg",
+              mime_type: "image/png",
               data: base64Data
             }
           }
@@ -64,8 +65,10 @@ export default async function handler(req, res) {
       }
     };
 
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
     const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
-    const response = await fetch(`${GEMINI_API_URL}?key=${process.env.GEMINI_API_KEY}`, {
+
+    const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -74,7 +77,7 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
+      const errorData = await response.json();
       throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
     }
 
@@ -88,6 +91,6 @@ export default async function handler(req, res) {
     res.json({ description: description.trim() });
   } catch (error) {
     console.error('Image analysis error:', error);
-    res.status(500).json({ error: error.message || 'Internal server error' });
+    res.status(500).json({ error: error.message });
   }
 }
