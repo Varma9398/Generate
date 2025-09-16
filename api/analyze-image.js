@@ -26,10 +26,10 @@ export default async function handler(req, res) {
     
     const stylePrompts = {
       paper: {
-        subtle: "subtle paper art style with light newspaper textures and minimal paint splashes",
-        moderate: "expressive paper art style with vibrant black line art on textured newspaper background, enhanced with splashes of bright blue and orange paint",
-        strong: "bold paper art style with strong black line illustrations on heavily textured newspaper collage, dramatic splashes of bright blue and orange paint",
-        extreme: "extreme paper art style with intense black ink illustrations on complex newspaper collage background, explosive splashes of bright blue, orange, and additional vibrant colors"
+        subtle: "subtle paper art style with light newspaper textures",
+        moderate: "expressive paper art style with vibrant black line art on textured newspaper background",
+        strong: "bold paper art style with strong black line illustrations",
+        extreme: "extreme paper art style with intense black ink illustrations"
       }
     };
 
@@ -39,15 +39,7 @@ export default async function handler(req, res) {
       contents: [{
         parts: [
           {
-            text: `Analyze this image and describe the subject in detail for creating a ${currentStyle}. Focus on:
-            1. The main subject (person, object, scene)
-            2. Key facial features, expressions, and characteristics
-            3. Clothing, accessories, or notable elements
-            4. The overall mood and composition
-
-            Create a detailed description that will be used to generate a ${artStyle} style image. The composition should fuse realism and abstract expressionism.
-
-            Format your response as a single descriptive paragraph suitable for image generation, starting with "A ${styleIntensity} ${artStyle} art style illustration of"`
+            text: `Analyze this image and create a detailed description for generating a ${currentStyle}. Focus on the main subject, features, and composition. Format as: "A ${styleIntensity} ${artStyle} art style illustration of..."`
           },
           {
             inline_data: {
@@ -66,6 +58,11 @@ export default async function handler(req, res) {
     };
 
     const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+    
+    if (!GEMINI_API_KEY) {
+      return res.status(500).json({ error: 'Gemini API key not configured' });
+    }
+
     const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
 
     const response = await fetch(`${GEMINI_API_URL}?key=${GEMINI_API_KEY}`, {
@@ -77,7 +74,7 @@ export default async function handler(req, res) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({}));
       throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
     }
 
@@ -88,7 +85,7 @@ export default async function handler(req, res) {
       throw new Error('No description generated from Gemini API');
     }
 
-    res.json({ description: description.trim() });
+    res.status(200).json({ description: description.trim() });
   } catch (error) {
     console.error('Image analysis error:', error);
     res.status(500).json({ error: error.message });

@@ -18,31 +18,19 @@ export default async function handler(req, res) {
   }
 
   try {
-    const imagesDir = path.join(process.cwd(), 'public', 'images');
+    // For Vercel, we'll return a static list since file system access is limited
+    // In production, you would typically use a database or external storage
+    const staticImages = [];
     
-    // Check if directory exists
-    try {
-      await fs.access(imagesDir);
-    } catch (error) {
-      return res.json({ images: [] });
+    // Generate a list of potential image numbers (you can customize this)
+    for (let i = 1; i <= 50; i++) {
+      const num = i.toString().padStart(3, '0');
+      staticImages.push(num);
     }
     
-    // Read directory contents
-    const files = await fs.readdir(imagesDir);
-    
-    // Filter for image files and extract numbers
-    const imageNumbers = files
-      .filter(file => file.toLowerCase().endsWith('.png') || file.toLowerCase().endsWith('.jpg') || file.toLowerCase().endsWith('.jpeg'))
-      .map(file => {
-        const match = file.match(/^(\d+)\./); // Extract number from filename like "001.png"
-        return match ? match[1] : null;
-      })
-      .filter(num => num !== null)
-      .sort((a, b) => parseInt(a) - parseInt(b)); // Sort numerically
-    
-    res.json({ images: imageNumbers });
+    res.status(200).json({ images: staticImages });
   } catch (error) {
-    console.error('Error reading images directory:', error);
-    res.status(500).json({ error: 'Failed to read images directory' });
+    console.error('Error in images API:', error);
+    res.status(500).json({ error: 'Failed to get images' });
   }
 }
