@@ -1,6 +1,47 @@
 # Cloud AI Image Generator - Secure Backend
 
+[![Deploy](https://img.shields.io/badge/deploy-ready-brightgreen.svg)](https://github.com/Varma9398/Ge)
+[![Security](https://img.shields.io/badge/security-hardened-blue.svg)](https://github.com/Varma9398/Ge)
+[![Node.js](https://img.shields.io/badge/node.js-18+-green.svg)](https://nodejs.org/)
+
 A secure web application for AI-powered image style transformation with a Node.js backend to protect API credentials.
+
+## 🚀 **Quick Deploy Options**
+
+### **Option 1: Vercel (Recommended - Free)**
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Varma9398/Ge)
+
+1. Click the deploy button above
+2. Connect your GitHub account
+3. Add environment variables in Vercel dashboard:
+   - `GEMINI_API_KEY`
+   - `SUPABASE_URL` 
+   - `SUPABASE_ANON_KEY`
+   - `ALLOWED_ORIGINS`
+4. Deploy automatically!
+
+### **Option 2: Netlify**
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Varma9398/Ge)
+
+1. Click deploy button
+2. Connect GitHub
+3. Add environment variables in Netlify dashboard
+4. Deploy!
+
+### **Option 3: Railway**
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/Varma9398/Ge)
+
+### **Option 4: Render**
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Varma9398/Ge)
+
+### **Option 5: Docker (Self-hosted)**
+```bash
+git clone https://github.com/Varma9398/Ge.git
+cd Ge
+cp .env.example .env
+# Edit .env with your API keys
+docker-compose up -d
+```
 
 ## 🔒 Security Features
 
