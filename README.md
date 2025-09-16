@@ -6,9 +6,7 @@
 
 A secure web application for AI-powered image style transformation with a Node.js backend to protect API credentials.
 
-## 🚀 **Quick Deploy Options**
-
-### **Option 1: Vercel (Recommended - Free)**
+## 🚀 **Deploy to Vercel (FREE)**
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Varma9398/Ge)
 
 1. Click the deploy button above
@@ -20,28 +18,14 @@ A secure web application for AI-powered image style transformation with a Node.j
    - `ALLOWED_ORIGINS`
 4. Deploy automatically!
 
-### **Option 2: Netlify**
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/Varma9398/Ge)
+## 📋 **Required Environment Variables**
 
-1. Click deploy button
-2. Connect GitHub
-3. Add environment variables in Netlify dashboard
-4. Deploy!
-
-### **Option 3: Railway**
-[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https://github.com/Varma9398/Ge)
-
-### **Option 4: Render**
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Varma9398/Ge)
-
-### **Option 5: Docker (Self-hosted)**
-```bash
-git clone https://github.com/Varma9398/Ge.git
-cd Ge
-cp .env.example .env
-# Edit .env with your API keys
-docker-compose up -d
-```
+| Variable | Description | Where to Get |
+|----------|-------------|--------------|
+| `GEMINI_API_KEY` | Google Gemini AI API key | [Get it here](https://aistudio.google.com/app/apikey) |
+| `SUPABASE_URL` | Your Supabase project URL | [Supabase Dashboard](https://supabase.com/dashboard) |
+| `SUPABASE_ANON_KEY` | Supabase anonymous key | [Supabase Dashboard](https://supabase.com/dashboard) |
+| `ALLOWED_ORIGINS` | Your deployed domain URL | e.g., `https://your-app.vercel.app` |
 
 ## 🔒 Security Features
 
