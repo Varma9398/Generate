@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vercel dev",
-    "build": "echo 'No build required'"
+    "build": "echo 'Static site - no build required'",
+    "start": "echo 'Static site - no start required'"
   },
   "dependencies": {},
   "engines": {
