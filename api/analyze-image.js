@@ -1,6 +1,4 @@
-const multiparty = require('multiparty');
-
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -15,26 +13,15 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const form = new multiparty.Form();
+    // Handle JSON body with base64 image data
+    const { imageData, artStyle = 'paper', styleIntensity = 'moderate' } = req.body;
     
-    const { fields, files } = await new Promise((resolve, reject) => {
-      form.parse(req, (err, fields, files) => {
-        if (err) reject(err);
-        else resolve({ fields, files });
-      });
-    });
-
-    if (!files.image || !files.image[0]) {
-      return res.status(400).json({ error: 'No image file provided' });
+    if (!imageData) {
+      return res.status(400).json({ error: 'No image data provided' });
     }
 
-    const artStyle = fields.artStyle?.[0] || 'paper';
-    const styleIntensity = fields.styleIntensity?.[0] || 'moderate';
-
-    // Read file buffer
-    const fs = require('fs');
-    const imageBuffer = fs.readFileSync(files.image[0].path);
-    const imageBase64 = imageBuffer.toString('base64');
+    // Extract base64 data (remove data URL prefix if present)
+    const base64Data = imageData.includes(',') ? imageData.split(',')[1] : imageData;
     
     const stylePrompts = {
       paper: {
@@ -63,8 +50,8 @@ module.exports = async (req, res) => {
           },
           {
             inline_data: {
-              mime_type: files.image[0].headers['content-type'],
-              data: imageBase64
+              mime_type: "image/jpeg",
+              data: base64Data
             }
           }
         ]
@@ -87,7 +74,7 @@ module.exports = async (req, res) => {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
+      const errorData = await response.json().catch(() => ({ error: { message: 'Unknown error' } }));
       throw new Error(`Gemini API error: ${errorData.error?.message || response.statusText}`);
     }
 
@@ -101,6 +88,6 @@ module.exports = async (req, res) => {
     res.json({ description: description.trim() });
   } catch (error) {
     console.error('Image analysis error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: error.message || 'Internal server error' });
   }
-};
+}

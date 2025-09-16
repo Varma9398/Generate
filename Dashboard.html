@@ -877,17 +877,17 @@
         
         // Step 1: Analyze image using backend API
         updateProgress(20);
-        const formData = new FormData();
-        
-        // Convert base64 back to blob for upload
-        const blob = await fetch(`data:${uploadedImageData.split(';')[0].split(':')[1]};base64,${uploadedImageBase64}`).then(r => r.blob());
-        formData.append('image', blob);
-        formData.append('artStyle', artStyle);
-        formData.append('styleIntensity', styleIntensity);
         
         const analysisResponse = await fetch(`${API_BASE_URL}/analyze-image`, {
           method: 'POST',
-          body: formData
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            imageData: uploadedImageData,
+            artStyle: artStyle,
+            styleIntensity: styleIntensity
+          })
         });
         
         if (!analysisResponse.ok) {
